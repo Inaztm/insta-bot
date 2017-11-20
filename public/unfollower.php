@@ -1,9 +1,8 @@
 <?php
 set_time_limit(100000000000);
 error_reporting(E_ALL);
-	$conn = mysql_connect("HOST","USER","PASSWORD");
-	//$conn = mysql_connect("localhost","root","");
-    $db = mysql_select_db("instagram",$conn);
+
+$db = mysqli_connect("localhost", "root", "", "instagram");
 
 function unfollowuser($userid){
 
@@ -88,21 +87,21 @@ function findme($array){
 }
 
 
-$firstrow = mysql_query("SELECT `id` FROM follows LIMIT 1");
-$first = mysql_fetch_row($firstrow);
+$firstrow = mysqli_query("SELECT `id` FROM follows LIMIT 1");
+$first = mysqli_fetch_row($firstrow);
 $i = $first[0];
 echo $i;
 while(true){  
-	$firstrow = mysql_query("SELECT `id` FROM follows LIMIT 1");
-	$first = mysql_fetch_row($firstrow);
-	$result = mysql_query("SELECT `id`, `userid`, `username`, `epoch`, `follow` FROM follows WHERE `id` = '$i'");
-	$rows = mysql_query("SELECT * FROM follows");
+	$firstrow = mysqli_query("SELECT `id` FROM follows LIMIT 1");
+	$first = mysqli_fetch_row($firstrow);
+	$result = mysqli_query("SELECT `id`, `userid`, `username`, `epoch`, `follow` FROM follows WHERE `id` = '$i'");
+	$rows = mysqli_query("SELECT * FROM follows");
 	if (!$result) {
-    	echo 'Could not run query: ' . mysql_error();
+    	echo 'Could not run query: ' . mysqli_error();
     	exit;
 	}
-	$numrows = mysql_num_rows($rows);
-	$row = mysql_fetch_row($result);
+	$numrows = mysqli_num_rows($rows);
+	$row = mysqli_fetch_row($result);
 	$val=time()-12000; //1/2 hour
 	
 	$user = $row[1];
@@ -118,10 +117,10 @@ while(true){
 		
 			echo "Unfollowing user: " . $user . "\n\n";
 			$unfollow = unfollowuser($user);
-			mysql_query("DELETE FROM follows WHERE id = '$i'");
+			mysqli_query("DELETE FROM follows WHERE id = '$i'");
 		}else{
 			echo "Setting user: " . $user . " follows to YES \n\n";
-			mysql_query("UPDATE follows SET follow = 'YES' WHERE id = '$i'");
+			mysqli_query("UPDATE follows SET follow = 'YES' WHERE id = '$i'");
 		}
 
 	}

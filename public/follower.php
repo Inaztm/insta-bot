@@ -3,10 +3,10 @@
 set_time_limit(100000000000);
 error_reporting(E_ALL);
 
-//open up database
-$conn = mysql_connect("HOST","USER","PASSWORD");
+define('TOKEN', '1414700505.fe29699.b9bb6536a2d64187abae241ffe5d2121');
 
-$db = mysql_select_db("instagram",$conn);
+//open up database
+$db = mysqli_connect("localhost", "root", "", "instagram");
 
 //Get data from instagram api
 
@@ -16,8 +16,7 @@ $hashtag = 'instagood';
 //$mediaID = "367252842664714004_27734630";
 
 $limit = 5;
-$token = '1414700505.fe29699.b9bb6536a2d64187abae241ffe5d2121';
-$url   = 'https://api.instagram.com/v1/tags/'. $hashtag .'/media/recent?access_token='. $token;
+$url   = 'https://api.instagram.com/v1/tags/'. $hashtag .'/media/recent?access_token='. TOKEN;
 
 function getphotos($url) {
   try {
@@ -30,6 +29,9 @@ function getphotos($url) {
     //Data are stored in $data
     $tags = json_decode(curl_exec($curl_connection), true);
     curl_close($curl_connection);
+
+    var_dump($tags);
+
     return $tags;
 
   } catch(Exception $e) {
@@ -38,10 +40,9 @@ function getphotos($url) {
 }
 
 function likephoto($mediaID){
-  $token = '1146950746.1fb234f.c976492e54924c79b90ae3d7c152511b';
 
   try {
-    $url = 'https://api.instagram.com/v1/media/'.$mediaID.'/likes?access_token='.$token;
+    $url = 'https://api.instagram.com/v1/media/'.$mediaID.'/likes?access_token='.TOKEN;
 
     $curl_connection = curl_init($url);
 
@@ -70,14 +71,13 @@ function likephoto($mediaID){
 }
 
 function followuser($userid){
-  $token ='1146950746.1fb234f.c976492e54924c79b90ae3d7c152511b';
 
   try {
 
   $url = 'https://api.instagram.com/v1/users/'. $userid .'/relationship';
 
   $access_token_parameters = array(
-    'access_token' => $token,
+    'access_token' => TOKEN,
     'action'       => 'follow'
   ); 
 
@@ -106,10 +106,9 @@ function followuser($userid){
 }
 
 function getusermedia($userid){
-  $token = '1146950746.1fb234f.c976492e54924c79b90ae3d7c152511b';
 
   try {
-    $url = 'https://api.instagram.com/v1/users/'.$userid.'/media/recent/?access_token='.$token;
+    $url = 'https://api.instagram.com/v1/users/'.$userid.'/media/recent/?access_token='.TOKEN;
 
     $curl_connection = curl_init($url);
 
@@ -137,7 +136,7 @@ $tags = getphotos($url);
 $i = 0;
 $count = 0;
 
-while( isset($tags['pagination']['next_url']) ){
+while ( isset($tags['pagination']['next_url']) ) {
   $tags = getphotos($url);
   $interval = rand(14,36);
   $followinterval = rand(3,6);
@@ -186,7 +185,7 @@ while( isset($tags['pagination']['next_url']) ){
   $count++;
   $time = time();
 
-  mysql_query("INSERT INTO follows(`userid`,`username`,`epoch`) VALUES('$userid','$username','$time')") or die(mysql_error());
+  mysqli_query("INSERT INTO follows(`userid`,`username`,`epoch`) VALUES('$userid','$username','$time')") or die(mysqli_error());
 
   //wait before looping again
   sleep($interval);
@@ -198,6 +197,8 @@ while( isset($tags['pagination']['next_url']) ){
 
 echo 'no more urls';
 
-print_r($tags['pagination']);
+if (isset($tag['pagination'])) {
+  print_r($tags['pagination']);
+}
 
 ?>
